@@ -1,5 +1,5 @@
-import { User } from '../models/models.js';
-import { USERS, modifyUsers } from '../data/data.js';
+import { User } from '../models/models';
+import { USERS, modifyUsers } from '../data/data';
 
 export function saveUser(user: User) {
   USERS.push(user);

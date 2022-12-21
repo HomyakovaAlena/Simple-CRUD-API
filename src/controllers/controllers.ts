@@ -1,9 +1,8 @@
-import { USERS } from '../data/data.js';
+import { USERS } from '../data/data';
 import { validate as uuidValidate } from 'uuid';
 import { v4 as uuidv4 } from 'uuid';
-import { User } from '../models/models.js';
-import { saveUser, deleteUser, updateUser } from '../services/fsService.js';
-
+import { User } from '../models/models';
+import { saveUser, deleteUser, updateUser } from '../services/fsService';
 export class Controller {
   async getUsers() {
     return new Promise((resolve) => {

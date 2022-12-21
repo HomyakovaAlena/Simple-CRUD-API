@@ -8,9 +8,10 @@
     "start1": "webpack serve --open --config webpack.dev.js",
     "start2": "tsc && node dist/index.js",
     "start:dev": "nodemon --watch src/**/*.ts -L --exec ts-node src/index.ts",
+    "start:dev2": "nodemon --watch src/**/*.ts -L",
     "build": "cross-env NODE_ENV=production PORT=process.env.PORT webpack --config webpack.prod.js",
     "lint": "eslint . --fix",
-    "test": "npx jest"
+    "test": "npm run lint && cross-env NODE_OPTIONS=--experimental-vm-modules npx jest --detectOpenHandles --verbose"
   },
   "repository": {
     "type": "git",
@@ -26,8 +27,11 @@
   "devDependencies": {
     "@tsconfig/node18": "^1.0.1",
     "@types/dotenv-webpack": "^7.0.3",
+    "@types/jest": "^29.2.4",
     "@types/node": "^18.11.17",
+    "@types/supertest": "^2.0.12",
     "@types/uuid": "^9.0.0",
+    "@types/webpack": "^5.28.0",
     "@typescript-eslint/eslint-plugin": "^5.46.1",
     "@typescript-eslint/parser": "^5.46.1",
     "clean-webpack-plugin": "^4.0.0",
@@ -43,6 +47,7 @@
     "jest": "^29.3.1",
     "nodemon": "^2.0.20",
     "prettier": "^2.8.1",
+    "supertest": "^6.3.3",
     "ts-jest": "^29.0.3",
     "ts-loader": "^9.4.2",
     "ts-node": "^10.9.1",

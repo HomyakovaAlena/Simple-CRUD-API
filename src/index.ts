@@ -1,13 +1,13 @@
 import * as http from 'node:http';
 import 'dotenv/config';
-import { Controller } from './controllers/controllers.js';
-import { getReqData } from './services/httpService.js';
-import { checkBody } from './services/httpService.js';
+import { Controller } from './controllers/controllers';
+import { getReqData } from './services/httpService';
+import { checkBody } from './services/httpService';
 import { User } from './models/models';
 
-const PORT = process.env.PORT || 4000;
+export const PORT = process.env.PORT || 4000;
 
-const server = http.createServer(async (req, res) => {
+export const server = http.createServer(async (req, res) => {
   if (req.url === '/api/users' && req.method === 'GET') {
     const users = await new Controller().getUsers();
     res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -75,6 +75,6 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-server.listen(PORT, () => {
+export const app = server.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
