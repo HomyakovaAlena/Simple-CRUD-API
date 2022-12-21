@@ -1,9 +1,10 @@
-import { USERS } from '../data/data';
+import { USERS } from '../data/user.data.js';
 import { validate as uuidValidate } from 'uuid';
 import { v4 as uuidv4 } from 'uuid';
-import { User } from '../models/models';
-import { saveUser, deleteUser, updateUser } from '../services/fsService';
-export class Controller {
+import { User, CreatedUser } from '../models/user.model.js';
+import { saveUser, deleteUser, updateUser } from './fs.service.js';
+
+export class UserService {
   async getUsers() {
     return new Promise((resolve) => {
       resolve(USERS);
@@ -25,7 +26,7 @@ export class Controller {
     });
   }
 
-  async createUser(userData: Pick<User, 'username' | 'age' | 'hobbies'>) {
+  async createUser(userData: CreatedUser) {
     return new Promise((resolve) => {
       const generatedId = uuidv4();
       const createdUser = {

@@ -1,76 +1,38 @@
 import * as http from 'node:http';
 import 'dotenv/config';
-import { Controller } from './controllers/controllers';
-import { getReqData } from './services/httpService';
-import { checkBody } from './services/httpService';
-import { User } from './models/models';
-
-export const PORT = process.env.PORT || 4000;
+import { UserController } from './controllers/user.controller.js';
+import {
+  HttpStatusCode,
+  HttpMethod,
+  ENDPOINT_USERS,
+  ENDPOINT_USERS_ID,
+  PORT,
+} from './constants/http.constants.js';
 
 export const server = http.createServer(async (req, res) => {
-  if (req.url === '/api/users' && req.method === 'GET') {
-    const users = await new Controller().getUsers();
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify(users));
-  } else if (req.url?.startsWith('/api/users/') && req.method === 'GET') {
-    const id = req.url.split('/')[3];
-    try {
-      const user = await new Controller().getUserById(id);
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(user));
-    } catch (err) {
-      if (err === `User with id ${id} not found`) {
-        res.writeHead(404, { 'Content-Type': 'application/json' });
-      } else {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-      }
-      res.end(JSON.stringify({ message: err }));
-    }
-  } else if (req.url === '/api/users' && req.method === 'POST') {
-    const body = (await getReqData(req)) as User;
-    const bodyError = checkBody(body, ['username', 'age', 'hobbies']);
-    if (bodyError) {
-      res.writeHead(400, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ message: bodyError }));
-    } else {
-      const user = await new Controller().createUser(body);
-      res.writeHead(201, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(user));
-    }
-  } else if (req.url?.startsWith('/api/users/') && req.method === 'PUT') {
-    const id = req.url.split('/')[3];
-    try {
-      const body = (await getReqData(req)) as User;
-      const user = await new Controller().updateUser(id, body);
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(user));
-    } catch (err) {
-      if (err === `User with id ${id} not found`) {
-        res.writeHead(404, { 'Content-Type': 'application/json' });
-      } else {
-        console.log(err);
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-      }
-      res.end(JSON.stringify({ message: err }));
-    }
-  } else if (req.url?.startsWith('/api/users/') && req.method === 'DELETE') {
-    const id = req.url.split('/')[3];
-    try {
-      const deletedUserMeassage = await new Controller().deleteUser(id);
-      console.log(deletedUserMeassage);
-      res.writeHead(204, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ message: deletedUserMeassage }));
-    } catch (err) {
-      if (err === `User with id ${id} not found`) {
-        res.writeHead(404, { 'Content-Type': 'application/json' });
-      } else {
-        console.log(err);
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-      }
-      res.end(JSON.stringify({ message: err }));
-    }
+  if (req.url === ENDPOINT_USERS && req.method === HttpMethod.GET) {
+    await new UserController().getUsers(res);
+  } else if (
+    req.url?.startsWith(ENDPOINT_USERS_ID) &&
+    req.method === HttpMethod.GET
+  ) {
+    await new UserController().getUserById(req, res);
+  } else if (req.url === ENDPOINT_USERS && req.method === HttpMethod.POST) {
+    await new UserController().createUser(req, res);
+  } else if (
+    req.url?.startsWith(ENDPOINT_USERS_ID) &&
+    req.method === HttpMethod.PUT
+  ) {
+    await new UserController().updateUser(req, res);
+  } else if (
+    req.url?.startsWith(ENDPOINT_USERS_ID) &&
+    req.method === HttpMethod.DELETE
+  ) {
+    await new UserController().deleteUser(req, res);
   } else {
-    res.writeHead(404, { 'Content-Type': 'application/json' });
+    res.writeHead(HttpStatusCode.NOT_FOUND, {
+      'Content-Type': 'application/json',
+    });
     res.end(JSON.stringify({ message: 'Route not found' }));
   }
 });

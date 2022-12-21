@@ -17,10 +17,6 @@ export function getReqData(req: http.IncomingMessage) {
   });
 }
 
-export function createError(statusCode: number, message: string) {
-  return { statusCode, message };
-}
-
 export function checkBody(body: object, keys: string[]) {
   const bodyKeys = Object.keys(body);
   if (bodyKeys.length === 0) {

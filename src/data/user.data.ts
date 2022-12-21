@@ -1,4 +1,4 @@
-import { User } from '../models/models';
+import { User } from '../models/user.model.js';
 
 // eslint-disable-next-line prefer-const
 export let USERS: User[] = [];

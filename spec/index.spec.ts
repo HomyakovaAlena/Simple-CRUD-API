@@ -1,5 +1,5 @@
 import supertest from 'supertest';
-import { app } from '../src/index';
+import { app } from '../src/index.js';
 import { validate as uuidValidate } from 'uuid';
 
 const newUser = {
