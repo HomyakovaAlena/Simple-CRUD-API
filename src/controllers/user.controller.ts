@@ -4,7 +4,7 @@ import { User } from '../models/user.model.js';
 import { getReqData } from '../services/http.service.js';
 import { checkBody } from '../services/http.service.js';
 import { HttpStatusCode } from '../constants/http.constants.js';
-
+import { createError } from '../services/error.service.js';
 export class UserController {
   async getUsers(res: http.ServerResponse) {
     const users = await new UserService().getUsers();
@@ -19,16 +19,7 @@ export class UserController {
       res.writeHead(HttpStatusCode.OK, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(user));
     } catch (err) {
-      if (err === `User with id ${id} not found`) {
-        res.writeHead(HttpStatusCode.NOT_FOUND, {
-          'Content-Type': 'application/json',
-        });
-      } else {
-        res.writeHead(HttpStatusCode.BAD_REQUEST, {
-          'Content-Type': 'application/json',
-        });
-      }
-      res.end(JSON.stringify({ message: err }));
+      createError(res, err, id);
     }
   }
 
@@ -57,17 +48,7 @@ export class UserController {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(user));
     } catch (err) {
-      if (err === `User with id ${id} not found`) {
-        res.writeHead(HttpStatusCode.NOT_FOUND, {
-          'Content-Type': 'application/json',
-        });
-      } else {
-        console.log(err);
-        res.writeHead(HttpStatusCode.BAD_REQUEST, {
-          'Content-Type': 'application/json',
-        });
-      }
-      res.end(JSON.stringify({ message: err }));
+      createError(res, err, id);
     }
   }
 
@@ -75,23 +56,12 @@ export class UserController {
     const id = String(req.url?.split('/')[3]);
     try {
       const deletedUserMeassage = await new UserService().deleteUser(id);
-      console.log(deletedUserMeassage);
       res.writeHead(HttpStatusCode.NO_CONTENT, {
         'Content-Type': 'application/json',
       });
       res.end(JSON.stringify({ message: deletedUserMeassage }));
     } catch (err) {
-      if (err === `User with id ${id} not found`) {
-        res.writeHead(HttpStatusCode.NOT_FOUND, {
-          'Content-Type': 'application/json',
-        });
-      } else {
-        console.log(err);
-        res.writeHead(HttpStatusCode.BAD_REQUEST, {
-          'Content-Type': 'application/json',
-        });
-      }
-      res.end(JSON.stringify({ message: err }));
+      createError(res, err, id);
     }
   }
 }

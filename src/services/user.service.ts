@@ -1,13 +1,13 @@
-import { USERS } from '../data/user.data.js';
+import { usersStorage } from '../data/user.data.js';
 import { validate as uuidValidate } from 'uuid';
 import { v4 as uuidv4 } from 'uuid';
 import { User, CreatedUser } from '../models/user.model.js';
-import { saveUser, deleteUser, updateUser } from './fs.service.js';
+import { saveUser, deleteUser, updateUser } from './storage.service.js';
 
 export class UserService {
   async getUsers() {
     return new Promise((resolve) => {
-      resolve(USERS);
+      resolve(usersStorage);
     });
   }
 
@@ -15,7 +15,7 @@ export class UserService {
     return new Promise((resolve, reject) => {
       const isValidUUID = uuidValidate(id);
       if (isValidUUID) {
-        const foundUser = USERS.find((user: User) => user.id === id);
+        const foundUser = usersStorage.find((user: User) => user.id === id);
         if (foundUser) {
           resolve(foundUser);
         }
@@ -42,7 +42,7 @@ export class UserService {
     return new Promise((resolve, reject) => {
       const isValidUUID = uuidValidate(id);
       if (isValidUUID) {
-        const foundUser = USERS.find((user: User) => user.id === id);
+        const foundUser = usersStorage.find((user: User) => user.id === id);
         if (!foundUser) {
           reject(`User with id ${id} not found`);
         }
@@ -62,7 +62,7 @@ export class UserService {
     return new Promise((resolve, reject) => {
       const isValidUUID = uuidValidate(id);
       if (isValidUUID) {
-        const foundUser = USERS.find((user: User) => user.id === id);
+        const foundUser = usersStorage.find((user: User) => user.id === id);
         if (foundUser) {
           deleteUser(id);
           resolve(`User with id ${id} deleted`);

@@ -1,42 +1,83 @@
-import * as http from 'node:http';
 import 'dotenv/config';
-import { UserController } from './controllers/user.controller.js';
-import {
-  HttpStatusCode,
-  HttpMethod,
-  ENDPOINT_USERS,
-  ENDPOINT_USERS_ID,
-  PORT,
-} from './constants/http.constants.js';
+import { PORT } from './constants/http.constants.js';
+import cluster from 'node:cluster';
+import { cpus } from 'node:os';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import * as http from 'node:http';
+import { RequestOptions } from 'node:https';
+import { modifyUsers } from './data/user.data.js';
+import { User } from './models/user.model.js';
 
-export const server = http.createServer(async (req, res) => {
-  if (req.url === ENDPOINT_USERS && req.method === HttpMethod.GET) {
-    await new UserController().getUsers(res);
-  } else if (
-    req.url?.startsWith(ENDPOINT_USERS_ID) &&
-    req.method === HttpMethod.GET
-  ) {
-    await new UserController().getUserById(req, res);
-  } else if (req.url === ENDPOINT_USERS && req.method === HttpMethod.POST) {
-    await new UserController().createUser(req, res);
-  } else if (
-    req.url?.startsWith(ENDPOINT_USERS_ID) &&
-    req.method === HttpMethod.PUT
-  ) {
-    await new UserController().updateUser(req, res);
-  } else if (
-    req.url?.startsWith(ENDPOINT_USERS_ID) &&
-    req.method === HttpMethod.DELETE
-  ) {
-    await new UserController().deleteUser(req, res);
-  } else {
-    res.writeHead(HttpStatusCode.NOT_FOUND, {
-      'Content-Type': 'application/json',
-    });
-    res.end(JSON.stringify({ message: 'Route not found' }));
-  }
+const filename = fileURLToPath(import.meta.url);
+const dirName = dirname(filename);
+const numCPUs = cpus().length;
+const environment = process.env.NODE_ENV;
+
+console.log(`Primary process pid=${process.pid}`);
+cluster.setupPrimary({
+  exec: dirName + '/server.js',
 });
+let cur = 0;
 
-export const app = server.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+if (environment === 'multi') {
+  if (cluster.isPrimary) {
+    for (let i = 0; i < numCPUs; i++) {
+      cluster.fork({ workerPort: Number(PORT) + i + 1 });
+    }
+    const servers = Object.values(cluster.workers || {}).map(
+      (worker, index) => `http://localhost:${Number(PORT) + index + 1}`
+    );
+    http
+      .createServer(async (req, res) => {
+        console.log(
+          `Primary server listening to request by primary process pid ${process.pid}
+          )}`
+        );
+
+        const urlPath = new URL(`${servers[cur]}${String(req.url)}`).href;
+        const options: RequestOptions = {
+          method: req.method,
+          headers: req.headers,
+        };
+
+        const requestForWorker = http
+          .request(urlPath, options, (resp) => {
+            resp.pipe(res);
+          })
+          .on('error', (error) => {
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+          });
+
+        req.pipe(requestForWorker);
+        cur = (cur + 1) % servers.length;
+      })
+      .listen(PORT, () => {
+        console.log(`Primary ${process.pid} started on ${PORT}`);
+      });
+
+    cluster.on('listening', (worker, address) => {
+      console.log(
+        `Worker ${worker.id} is now connected to http://localhost:${address.port}`
+      );
+    });
+
+    cluster.on('exit', (worker, code, signal) => {
+      console.log(`worker ${String(worker.process.pid)} died`);
+      if (code !== 0 && !worker.exitedAfterDisconnect) {
+        console.log('Starting a new worker...');
+        cluster.fork({ port: 4000 + worker.id });
+      }
+    });
+  } else {
+    import('./server.js');
+  }
+}
+
+cluster.on('message', (worker, message: { users: User[] }) => {
+  modifyUsers(message.users);
+  const workers = Object.values(cluster.workers || {});
+  Object.values(workers).forEach((workerr) => {
+    workerr?.send(message);
+  });
 });

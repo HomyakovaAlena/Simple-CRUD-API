@@ -1,5 +1,5 @@
 import supertest from 'supertest';
-import { app } from '../src/index.js';
+import { server } from '../src/server.js';
 import { validate as uuidValidate } from 'uuid';
 
 const newUser = {
@@ -11,7 +11,7 @@ const { username, age, hobbies } = newUser;
 
 describe('Get Endpoint', () => {
   it('should create a new get all users request', async () => {
-    const res = await supertest(app).get('/api/users').send();
+    const res = await supertest(server).get('/api/users').send();
     expect(res.statusCode).toEqual(200);
     expect(res.body).toEqual([]);
   });
@@ -19,7 +19,7 @@ describe('Get Endpoint', () => {
 
 describe('Post Endpoint', () => {
   it('should create a new post request', async () => {
-    const res = await supertest(app).post('/api/users').send({
+    const res = await supertest(server).post('/api/users').send({
       username,
       age,
       hobbies,
@@ -33,13 +33,13 @@ describe('Post Endpoint', () => {
 
 describe('Delete Endpoint', () => {
   it('should create a new delete request', async () => {
-    const responsePost = await supertest(app).post('/api/users').send({
+    const responsePost = await supertest(server).post('/api/users').send({
       username,
       age,
       hobbies,
     });
     const id = responsePost.body.id;
-    const responseDelete = await supertest(app)
+    const responseDelete = await supertest(server)
       .delete(`/api/users/${id}`)
       .send();
     expect(responseDelete.statusCode).toEqual(204);
@@ -48,13 +48,13 @@ describe('Delete Endpoint', () => {
 
 describe('Get Endpoint', () => {
   it('should create a new get user by id request', async () => {
-    const responsePost = await supertest(app).post('/api/users').send({
+    const responsePost = await supertest(server).post('/api/users').send({
       username,
       age,
       hobbies,
     });
     const id = responsePost.body.id;
-    const responseGet = await supertest(app).get(`/api/users/${id}`).send();
+    const responseGet = await supertest(server).get(`/api/users/${id}`).send();
     expect(responseGet.statusCode).toEqual(200);
     expect(responseGet.body.username).toEqual('Bonifacio');
     expect(responseGet.body.hobbies).toEqual(['swimming', 'running']);
@@ -65,13 +65,13 @@ describe('Get Endpoint', () => {
 
 describe('Put Endpoint', () => {
   it('should create a new put request', async () => {
-    const responsePost = await supertest(app).post('/api/users').send({
+    const responsePost = await supertest(server).post('/api/users').send({
       username,
       age,
       hobbies,
     });
     const id = responsePost.body.id;
-    const responsePut = await supertest(app)
+    const responsePut = await supertest(server)
       .put(`/api/users/${id}`)
       .send({
         username: 'Antonio',

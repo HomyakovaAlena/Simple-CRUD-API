@@ -1,12 +1,13 @@
 import { User } from '../models/user.model.js';
-import { USERS, modifyUsers } from '../data/user.data.js';
+import { usersStorage, modifyUsers } from '../data/user.data.js';
 
 export function saveUser(user: User) {
-  USERS.push(user);
+  usersStorage.push(user);
+  console.log(usersStorage, 'from save user');
 }
 
 export function deleteUser(userId: string) {
-  modifyUsers(USERS.filter((foundUser) => foundUser.id !== userId));
+  modifyUsers(usersStorage.filter((foundUser) => foundUser.id !== userId));
 }
 
 export function updateUser(user: User) {
