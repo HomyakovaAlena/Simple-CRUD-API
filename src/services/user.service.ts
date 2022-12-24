@@ -1,8 +1,8 @@
-import { usersStorage } from '../data/user.data.js';
+import { usersStorage } from '../data/user.data';
 import { validate as uuidValidate } from 'uuid';
 import { v4 as uuidv4 } from 'uuid';
-import { User, CreatedUser } from '../models/user.model.js';
-import { saveUser, deleteUser, updateUser } from './storage.service.js';
+import { User, CreatedUser } from '../models/user.model';
+import { saveUser, deleteUser, updateUser } from './storage.service';
 
 export class UserService {
   async getUsers() {

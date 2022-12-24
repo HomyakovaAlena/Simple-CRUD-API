@@ -1,6 +1,8 @@
 import supertest from 'supertest';
-import { server } from '../src/server.js';
+import { server } from '../src/server';
 import { validate as uuidValidate } from 'uuid';
+import 'dotenv/config';
+const environment = process.env.NODE_ENV;
 
 const newUser = {
   username: 'Bonifacio',

@@ -1,4 +1,33 @@
 import http from 'node:http';
+import {
+  HttpMethod,
+  ENDPOINT_USERS,
+  ENDPOINT_USERS_ID,
+} from '../constants/http.constants';
+
+export function defineRequestType(req: http.IncomingMessage) {
+  if (req.url === ENDPOINT_USERS && req.method === HttpMethod.GET) {
+    return 'getUsersRequest';
+  } else if (
+    req.url?.startsWith(ENDPOINT_USERS_ID) &&
+    req.method === HttpMethod.GET
+  ) {
+    return 'getUserByIdRequest';
+  } else if (req.url === ENDPOINT_USERS && req.method === HttpMethod.POST) {
+    return 'postRequest';
+  } else if (
+    req.url?.startsWith(ENDPOINT_USERS_ID) &&
+    req.method === HttpMethod.PUT
+  ) {
+    return 'putRequest';
+  } else if (
+    req.url?.startsWith(ENDPOINT_USERS_ID) &&
+    req.method === HttpMethod.DELETE
+  ) {
+    return 'deleteRequest';
+  }
+  return 'default';
+}
 
 export function getReqData(req: http.IncomingMessage) {
   return new Promise((resolve, reject) => {
@@ -9,7 +38,7 @@ export function getReqData(req: http.IncomingMessage) {
       });
       req.on('end', () => {
         console.log(body);
-        resolve(JSON.parse(body));
+        resolve(body ? JSON.parse(body) : {});
       });
     } catch (error) {
       reject(error);

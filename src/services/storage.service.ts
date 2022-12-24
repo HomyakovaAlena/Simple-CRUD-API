@@ -1,9 +1,8 @@
-import { User } from '../models/user.model.js';
-import { usersStorage, modifyUsers } from '../data/user.data.js';
+import { User } from '../models/user.model';
+import { usersStorage, modifyUsers } from '../data/user.data';
 
 export function saveUser(user: User) {
   usersStorage.push(user);
-  console.log(usersStorage, 'from save user');
 }
 
 export function deleteUser(userId: string) {

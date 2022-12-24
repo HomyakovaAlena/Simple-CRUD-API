@@ -1,25 +1,23 @@
 import * as http from 'node:http';
-import { UserService } from '../services/user.service.js';
-import { User } from '../models/user.model.js';
-import { getReqData } from '../services/http.service.js';
-import { checkBody } from '../services/http.service.js';
-import { HttpStatusCode } from '../constants/http.constants.js';
-import { createError } from '../services/error.service.js';
+import { UserService } from '../services/user.service';
+import { User } from '../models/user.model';
+import { getReqData } from '../services/http.service';
+import { checkBody } from '../services/http.service';
+import { HttpStatusCode } from '../constants/http.constants';
+import { createUserIdError, sendResponse } from '../services/message.service';
 export class UserController {
   async getUsers(res: http.ServerResponse) {
     const users = await new UserService().getUsers();
-    res.writeHead(HttpStatusCode.OK, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify(users));
+    sendResponse(res, HttpStatusCode.OK, users);
   }
 
   async getUserById(req: http.IncomingMessage, res: http.ServerResponse) {
     const id = String(req.url?.split('/')[3]);
     try {
       const user = await new UserService().getUserById(id);
-      res.writeHead(HttpStatusCode.OK, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(user));
+      sendResponse(res, HttpStatusCode.OK, user);
     } catch (err) {
-      createError(res, err, id);
+      createUserIdError(res, err, id);
     }
   }
 
@@ -27,16 +25,10 @@ export class UserController {
     const body = (await getReqData(req)) as User;
     const bodyError = checkBody(body, ['username', 'age', 'hobbies']);
     if (bodyError) {
-      res.writeHead(HttpStatusCode.BAD_REQUEST, {
-        'Content-Type': 'application/json',
-      });
-      res.end(JSON.stringify({ message: bodyError }));
+      sendResponse(res, HttpStatusCode.BAD_REQUEST, bodyError);
     } else {
       const user = await new UserService().createUser(body);
-      res.writeHead(HttpStatusCode.CREATED, {
-        'Content-Type': 'application/json',
-      });
-      res.end(JSON.stringify(user));
+      sendResponse(res, HttpStatusCode.CREATED, user);
     }
   }
 
@@ -44,11 +36,15 @@ export class UserController {
     const id = String(req.url?.split('/')[3]);
     try {
       const body = (await getReqData(req)) as User;
-      const user = await new UserService().updateUser(id, body);
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(user));
+      const bodyError = checkBody(body, ['username', 'age', 'hobbies']);
+      if (bodyError) {
+        sendResponse(res, HttpStatusCode.BAD_REQUEST, bodyError);
+      } else {
+        const user = await new UserService().updateUser(id, body);
+        sendResponse(res, HttpStatusCode.OK, user);
+      }
     } catch (err) {
-      createError(res, err, id);
+      createUserIdError(res, err, id);
     }
   }
 
@@ -56,12 +52,9 @@ export class UserController {
     const id = String(req.url?.split('/')[3]);
     try {
       const deletedUserMeassage = await new UserService().deleteUser(id);
-      res.writeHead(HttpStatusCode.NO_CONTENT, {
-        'Content-Type': 'application/json',
-      });
-      res.end(JSON.stringify({ message: deletedUserMeassage }));
+      sendResponse(res, HttpStatusCode.NO_CONTENT, deletedUserMeassage);
     } catch (err) {
-      createError(res, err, id);
+      createUserIdError(res, err, id);
     }
   }
 }

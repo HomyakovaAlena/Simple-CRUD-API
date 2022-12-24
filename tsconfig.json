@@ -23,6 +23,7 @@
     "files": true,
     "preferTsExts": true,
     "allowSyntheticDefaultImports": true,
+    "module": "CommonJS",
     "compiler": "typescript",
     "include": ["src"],
     "exclude": ["node_modules", "spec"]
