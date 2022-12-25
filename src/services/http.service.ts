@@ -58,7 +58,7 @@ export function checkBody(body: object, keys: string[]) {
   }
   if (bodyKeys.length > keys.length) {
     const extraProps = bodyKeys.filter((prop) => !keys.includes(prop));
-    return `properties [ ${extraProps.join(',')} ] shouldn't exist`;
+    return `property(-ies) ${extraProps.join(',')} shouldn't exist`;
   }
 
   return null;

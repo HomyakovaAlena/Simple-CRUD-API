@@ -13,7 +13,7 @@
     "start:dev2": "cross-env NODE_ENV=development nodemon --watch src/**/*.ts -L",
     "build": "cross-env NODE_ENV=production webpack --config webpack.prod.js",
     "lint": "eslint . --fix",
-    "test": "npm run lint && cross-env NODE_OPTIONS=--experimental-vm-modules npx jest --detectOpenHandles --verbose"
+    "test": "npm run lint && cross-env NODE_OPTIONS=--experimental-vm-modules npx jest --detectOpenHandles --verbose --collectCoverage"
   },
   "repository": {
     "type": "git",
