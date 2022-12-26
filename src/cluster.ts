@@ -8,6 +8,7 @@ import * as http from 'node:http';
 import { RequestOptions } from 'node:https';
 import { modifyUsers } from './data/user.data';
 import { User } from './models/user.model';
+import { create500Response } from './services/message.service';
 
 const filename = fileURLToPath(import.meta.url);
 const dirName = dirname(filename);
@@ -41,10 +42,14 @@ if (cluster.isPrimary) {
 
       const requestForWorker = http
         .request(urlPath, options, (resp) => {
+          const respStatusCose = resp.statusCode as number;
+          res.writeHead(respStatusCose, {
+            'Content-Type': 'application/json',
+          });
           resp.pipe(res);
         })
         .on('error', (error) => {
-          res.writeHead(500, { 'Content-Type': 'application/json' });
+          create500Response(res);
         });
 
       req.pipe(requestForWorker);
@@ -67,7 +72,9 @@ if (cluster.isPrimary) {
 
 cluster.on('listening', (worker, address) => {
   console.log(
-    `Worker ${worker.id} is now connected to http://localhost:${address.port}`
+    `Worker ${worker.id} (pid=${String(
+      worker.process.pid
+    )}) is now connected to http://localhost:${address.port}`
   );
 });
 

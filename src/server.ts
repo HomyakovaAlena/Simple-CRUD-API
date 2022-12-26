@@ -16,15 +16,19 @@ export const server = http
     if (environment === 'multi') {
       cluster.worker?.send({ users: usersStorage });
       console.log(
-        `Worker ${String(cluster.worker?.id)} returned response on request`
+        `Worker pid=${String(cluster.worker?.id)} (pid=${
+          process.pid
+        }) returned response on request`
       );
     }
   })
   .listen(portToListen, () => {
     const msg =
       environment === 'multi'
-        ? `Worker ${process.pid} started on ${String(portToListen)}`
-        : `Server started on ${String(portToListen)}`;
+        ? `Worker pid=${process.pid} started on http://localhost:${String(
+            portToListen
+          )}`
+        : `Server started on http://localhost:${String(portToListen)}...`;
     console.log(msg);
   });
 

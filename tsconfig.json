@@ -1,6 +1,4 @@
 {
-  "$schema": "https://json.schemastore.org/tsconfig",
-  "display": "Node 18",
   "compilerOptions": {
     "lib": ["es2022", "dom", "WebWorker"],
     "target": "es2022",
