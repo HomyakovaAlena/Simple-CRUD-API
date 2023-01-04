@@ -2,8 +2,12 @@ import supertest from 'supertest';
 import { server } from '../src/server';
 import { validate as uuidValidate } from 'uuid';
 import { v4 as uuidv4 } from 'uuid';
-import { expect, jest } from '@jest/globals';
+import { afterEach, expect, jest } from '@jest/globals';
 import { modifyUsers } from '../src/data/user.data';
+import 'dotenv/config';
+const environment = process.env.NODE_ENV;
+
+console.log(environment);
 
 const newUser = {
   username: 'Bonifacio',
@@ -12,7 +16,7 @@ const newUser = {
 };
 const { username, age, hobbies } = newUser;
 
-afterEach(async () => {
+afterEach(() => {
   server.close();
   modifyUsers([]);
 });

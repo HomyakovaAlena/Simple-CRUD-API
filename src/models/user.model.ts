@@ -5,4 +5,4 @@ export interface User {
   hobbies: string[];
 }
 
-export type CreatedUser = Pick<User, 'username' | 'age' | 'hobbies'>;
+export type CreatedUser = Required<Pick<User, 'username' | 'age' | 'hobbies'>>;
